@@ -99,6 +99,8 @@ CLASSPATH_u = $(CLASSPATH_COMMON)
 CLASSPATH_s = $(CLASSPATH_COMMON)
 CLASSPATH_p = $(CLASSPATH_COMMON)
 
+JVMOPTFLAGS = -Xss4M
+
 # The bigloo compiler flags used to build the library heap files
 HEAPFLAGS = -I $(SRC_LIB_DIR) -unsafe -q -mkaddheap -mkaddlib \
 	     -heap-library
@@ -298,7 +300,7 @@ LIB_$2_BLFLAGS_$1 += $$(BLFLAGS_$1)
 
 .class_$1/bigloo/lib/$2/%.class: $(SRC_DIR)/lib/$2/%.scm
 	@if [ ! -d "$$(@D)" ]; then  mkdir -p $$(@D); fi
-	@$$(BIGLOO) -jvm $$(LIB_$2_BFLAGS_$1) $$(LIB_$2_BLFLAGS_$1) $$(LIB_$2_INCLUDE_FLAGS) $$< -o $$@ -c
+	$$(BIGLOO) -jvm -jfile $(JFILE) $$(LIB_$2_BFLAGS_$1) $$(LIB_$2_BLFLAGS_$1) $$(LIB_$2_INCLUDE_FLAGS) $$<  -o $$@ -c
 endef
 
 define scm_bin_pattern_rules
@@ -313,7 +315,7 @@ BIN_$2_BLFLAGS_$1 += $$(BLFLAGS_$1)
 
 .class_$1/bigloo/bin/$2/%.class: $(SRC_DIR)/bin/$2/%.scm
 	@if [ ! -d "$$(@D)" ]; then  mkdir -p $$(@D); fi
-	@$$(BIGLOO) -jvm $$(BIN_$2_BFLAGS_$1) $$(BIN_$2_BLFLAGS_$1) $$($2_INCLUDE_FLAGS) $$< -o $$@ -c
+	$$(BIGLOO)  -jvm -jfile $(JFILE) $$(BIN_$2_BFLAGS_$1) $$(BIN_$2_BLFLAGS_$1) $$($2_INCLUDE_FLAGS) $$<  -o $$@ -c
 endef
 
 define scm_test_pattern_rules
@@ -328,7 +330,7 @@ TEST_$2_BLFLAGS_$1 += $$(BLFLAGS_$1)
 
 .class_$1/bigloo/test/$2/%.class: $(TEST_DIR)/$2/%.scm | release_zips
 	@if [ ! -d "$$(@D)" ]; then  mkdir -p $$(@D); fi
-	@$$(BIGLOO) -jvm $$(TEST_$2_BFLAGS_$1) $$(TEST_$2_BLFLAGS_$1) $$(TEST_$2_INCLUDE_FLAGS) $$< -o $$@ -c                   
+	@$$(BIGLOO) -jvm -jfile $(JFILE) $$(TEST_$2_BFLAGS_$1) $$(TEST_$2_BLFLAGS_$1) $$(TEST_$2_INCLUDE_FLAGS) $$< -o $$@ -c                   
 
 endef
 
@@ -368,7 +370,7 @@ UNSAFE_LIBS := $(call make_lib_targets,u)
 
 PROFILE_LIBS := $(call make_lib_targets,p)
 
-RELEASE_LIBS := $(SAFE_LIBS) $(UNSAFE_LIBS) $(PROFILE_LIBS)
+RELEASE_LIBS := $(SAFE_LIBS) $(UNSAFE_LIBS) # $(PROFILE_LIBS)
 
 # Make functions
 define make_zip_targets
@@ -382,7 +384,7 @@ UNSAFE_ZIPS := $(call make_zip_targets,u)
 
 PROFILE_ZIPS := $(call make_zip_targets,p)
 
-RELEASE_ZIPS := $(SAFE_ZIPS) $(UNSAFE_ZIPS) $(PROFILE_ZIPS)
+RELEASE_ZIPS := $(SAFE_ZIPS) $(UNSAFE_ZIPS) #$(PROFILE_ZIPS)
 
 all: checkconf release
 
@@ -483,7 +485,7 @@ $(BUILD_BIN_DIR)/j$1_$2:  $$($1_CLASSES_$2) | $(JFILE) release_zips
 	@echo "building $$@..."
 	@if [ ! -d "$$(@D)" ]; then  mkdir -p $$(@D); fi
 	@$$(JAR) $(JARFLAGS) $$@.jar $$($1_CLASSES_$2:.class_$2/%=-C .class_$2/ .)
-	@$$(BIGLOO) -jvm  -jvm-classpath $$($1_CLASSPATH_$2) -o $$@ -jfile $(JFILE) $$(BIN_$1_BFLAGS_$2) \
+	@$$(BIGLOO) -jvm  -jvm-classpath $$($1_CLASSPATH_$2) -jvm-opt $(JVMOPTFLAGS) -o $$@ -jfile $(JFILE) $$(BIN_$1_BFLAGS_$2) \
                     $$(BIN_$1_BLFLAGS_$2) $$($1_INCLUDE_FLAGS)  $$($1_CLASSES_$2:.class_$2/%=%)
 endef
 
@@ -503,7 +505,7 @@ $(TEST_BUILD_DIR)/j$1: $(AFILE) $(JFILE) $$(TEST_$1_CLASSES) | release_zips
 	@echo "building $$@..."
 	@if [ ! -d "$$(@D)" ]; then  mkdir -p $$(@D); fi
 	@$$(JAR) $(JARFLAGS) $$@.jar $$(TEST_$1_CLASSES:.class_s/%=-C .class_s/ .)
-	@$$(BIGLOO) -jvm  -jvm-classpath $$(TEST_$1_CLASSPATH) -o $$@ -jfile $(JFILE) $$(TEST_$1_BFLAGS_s) \
+	@$$(BIGLOO) -jvm  -jvm-classpath $$(TEST_$1_CLASSPATH) -jvm-opt $(JVMOPTFLAGS) -o $$@ -jfile $(JFILE) $$(TEST_$1_BFLAGS_s) \
                     $$(TEST_$1_BLFLAGS_s) $$(TEST_$1_INCLUDE_FLAGS)  $$(TEST_$1_CLASSES:.class_s/%=%)
 endef
 

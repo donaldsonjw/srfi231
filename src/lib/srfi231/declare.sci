@@ -4,6 +4,8 @@ SRFI 231: Intervals and Generalized Arrays
 Copyright 2022, Joseph Donaldson
 Bigloo Adaption
 
+Ignore Gambit optimization declarations 
+
 Permission is hereby granted, free of charge,
 to any person obtaining a copy of this software
 and associated documentation files (the "Software"),
@@ -29,11 +31,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 |#
 
-
- (module srfi231_make_lib
-   (import srfi231-generic-arrays
-           srfi231-storage-class
-           srfi231-interval
-           srfi231-utils)
-   (eval (export-all)))
-
+;; ignore Gambit optimization declarations
+(define-macro (declare . args)
+   '#unspecified)
