@@ -3,18 +3,18 @@
 ** Description
   The srfi231 library is an implementation of [[https://srfi.schemers.org/srfi-231/srfi-231.html][SRFI 231]] for Bigloo
   scheme. It is an adaption of the sample implentation by Bradley
-  J. Lucier from Gambit Scheme to Bigloo.
+  J. Lucier for Gambit Scheme to Bigloo Scheme.
 
   It is feature complete but does differ from the Gambit
   implementation in that the specialized storage classes are only
   compatible with the generic-storage-class and not with other
-  specialized storage class with compatible ranges. For example, the
-  u8-storage-class is only compatible with itself and the
-  generic-storage-class. This may be changed in the future.
+  specialized storage classes with compatible ranges and that complex
+  storage classes are not supported. This may change in the future.
 
   Both the native and jvm backends are supported. It requires Bigloo
   4.5a or newer and is dependent on [[https://github.com/donaldsonjw/srfi39][SRFI 39]] and SRFI 27 (included with
-  Bigloo). 
+  Bigloo).
+  
 ** Building
   Both the bigloo native and jvm backends are supported. To build,
   execute:
@@ -23,7 +23,7 @@
 #+end_src
   where =<installation path prefix>= is the desired installation path
   prefix (e.g, =/usr/local=). You usually want the path prefix to match
-  that used for Bigloo itself.
+  that used by Bigloo itself.
 
 ** Installation
   To install the library, execute:
